@@ -1,0 +1,29 @@
+{
+  "name": "multi-tenant-nodemailer-pool",
+  "version": "1.0.0",
+  "description": "Fingerprinted SMTP connection pool and transporter cache for Nodemailer",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "example": "ts-node example/usage.ts"
+  },
+  "keywords": [
+    "nodemailer",
+    "smtp",
+    "connection-pool",
+    "multi-tenant",
+    "transporter-cache",
+    "email"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@types/nodemailer": "^6.4.15",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
