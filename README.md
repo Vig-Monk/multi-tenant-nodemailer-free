@@ -86,7 +86,7 @@ app.post('/api/send', async (req, res) => {
 ### Installation
 
 ```bash
-npm install multi-tenant-nodemailer-pool nodemailer
+npm install
 ```
 
 ### Run Example
