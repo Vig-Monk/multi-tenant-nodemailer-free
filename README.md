@@ -1,31 +1,63 @@
-# multi-tenant-nodemailer-pool
+multi-tenant-nodemailer-pool
 
-Fingerprinted SMTP connection pool and transporter cache for Nodemailer.
+Fingerprint-based SMTP connection pooling and transporter caching for Nodemailer.
 
-→ Full version ($7): https://gumroad.com/l/multi-tenant-nodemailer-pool
+«Built for multi-tenant SaaS applications where every tenant can bring their own SMTP credentials.»
 
-In multi-tenant SaaS applications where tenants bring their own SMTP credentials (Google Workspace, AWS SES, Brevo), creating a new Nodemailer transporter on every outgoing email causes massive handshake latency, socket exhaustion, and mail provider rate bans. Naively sharing a global transporter risks cross-tenant credential leaks.
+Full version — $7: https://gumroad.com/l/multi-tenant-nodemailer-pool
 
-This utility manages a dynamic connection pool indexed by tenant keys with SHA-256 configuration fingerprinting and automatic stale-socket eviction.
+---
 
-## The Fix
+The Problem
 
-### Before (Creates socket on every send, hits connection limits)
+In multi-tenant SaaS applications, tenants may use their own SMTP providers such as Google Workspace, AWS SES, or Brevo.
+
+Creating a new Nodemailer transporter for every email can cause:
+
+- Repeated TLS handshakes
+- Increased connection latency
+- Excessive socket creation
+- SMTP connection-limit errors
+- Provider rate limiting
+- Unnecessary resource usage
+
+At the same time, simply sharing one global transporter can create a serious cross-tenant credential isolation problem.
+
+The Solution
+
+"multi-tenant-nodemailer-pool" maintains a dynamic transporter cache indexed by tenant keys.
+
+Each SMTP configuration is SHA-256 fingerprinted, allowing the library to detect credential changes and automatically evict stale transporters.
+
+Before
+
+A new transporter and connection are created for every email:
 
 app.post('/api/send', async (req, res) => {
   const creds = await getTenantSmtp(req.tenantId);
-  const transporter = nodemailer.createTransport(creds); // Slow: new TLS handshake every call
+
+  const transporter = nodemailer.createTransport(creds);
+
+  // New TLS connection for every request
   await transporter.sendMail(payload);
+
   transporter.close();
 });
 
-### After (Zero-overhead connection reuse, auto-evicts on credential update)
+After
+
+Transporters are reused while remaining isolated by tenant:
 
 import { getOrCreateTransporter } from 'multi-tenant-nodemailer-pool';
 
 app.post('/api/send', async (req, res) => {
   const creds = await getTenantSmtp(req.tenantId);
-  const { transporter, from, replyTo } = getOrCreateTransporter(req.tenantId, creds);
+
+  const {
+    transporter,
+    from,
+    replyTo,
+  } = getOrCreateTransporter(req.tenantId, creds);
 
   await transporter.sendMail({
     from,
@@ -36,24 +68,110 @@ app.post('/api/send', async (req, res) => {
   });
 });
 
-## Quick Start
+When a tenant's SMTP configuration changes, the old cached transporter can be detected and evicted rather than continuing to use stale credentials.
+
+---
+
+Quick Start
 
 npm install
+
+Run the example:
+
 npm run example
 
-## What's Free vs. Paid
+---
 
-| Feature | Free Tier | Paid Version ($7) |
-|---|---|---|
-| SHA-256 config fingerprinting | Included | Included |
-| Transporter pooling and reuse | Included | Included |
-| Stale socket cache eviction | Included | Included |
-| Platform default SMTP fallback | - | Included |
-| AES-256-GCM encrypted credential boundary | - | Included |
-| Live connection verify + test delivery helper | - | Included |
-| PostgreSQL encrypted SMTP schema migration | - | Included |
-| Automated unit test suite | - | Included |
+Features
 
-→ Full version ($7): https://gumroad.com/l/multi-tenant-nodemailer-pool
+- 🔐 SHA-256 SMTP configuration fingerprinting
+- ♻️ Transporter pooling and connection reuse
+- 🧹 Automatic stale-transporter eviction
+- 🏢 Tenant-isolated transporter caching
+- 📧 Nodemailer-based SMTP delivery
+- ⚡ Avoids unnecessary TLS handshakes
+- 🔌 Supports tenant-specific SMTP credentials
 
-MIT (free tier)
+---
+
+Free vs. Paid
+
+Feature| Free| Paid ($7)
+SHA-256 config fingerprinting| ✓| ✓
+Transporter pooling and reuse| ✓| ✓
+Stale socket cache eviction| ✓| ✓
+Platform default SMTP fallback| —| ✓
+AES-256-GCM encrypted credential boundary| —| ✓
+Live connection verification| —| ✓
+Test delivery helper| —| ✓
+PostgreSQL encrypted SMTP schema migration| —| ✓
+Automated unit test suite| —| ✓
+
+Get the Full Version
+
+"Get the full version for $7 →" (https://gumroad.com/l/multi-tenant-nodemailer-pool)
+
+The paid version adds production-oriented functionality for applications that need encrypted credential storage, platform SMTP fallback, connection testing, PostgreSQL integration, and automated tests.
+
+---
+
+Example Architecture
+
+                    ┌─────────────────────┐
+                    │   Incoming Request  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │     Tenant ID       │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   SMTP Credentials  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ SHA-256 Fingerprint │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │  Transporter Cache  │
+                    └──────┬────────┬─────┘
+                           │        │
+                    Existing?     Changed?
+                           │        │
+                           ▼        ▼
+                        Reuse     Evict
+                           │        │
+                           └────┬───┘
+                                ▼
+                     ┌────────────────────┐
+                     │ Nodemailer SMTP    │
+                     │     Transporter    │
+                     └────────────────────┘
+
+---
+
+Use Cases
+
+This is particularly useful for:
+
+- Multi-tenant SaaS platforms
+- CRM systems
+- Transactional email services
+- Marketplace platforms
+- Business management systems
+- Applications where tenants configure their own SMTP provider
+
+---
+
+License
+
+The free version is released under the MIT License.
+
+---
+
+Full version — $7: https://gumroad.com/l/multi-tenant-nodemailer-pool
