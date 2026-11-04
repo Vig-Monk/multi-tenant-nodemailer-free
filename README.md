@@ -5,8 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Nodemailer](https://img.shields.io/badge/Nodemailer-v6.x-007acc.svg)](https://nodemailer.com/)
-[![Full Version](https://img.shields.io/badge/Gumroad-Full%20Version%20($7)-FF6B6B.svg?style=flat&logo=gumroad)](https://gumroad.com/l/multi-tenant-nodemailer-pool)
-
+[![Full Version](https://img.shields.io/badge/Payhip-Full%20Version%20($7)-FF6B6B.svg?style=flat)](https://payhip.com/b/h8vRj)
 ---
 
 ## The Problem
@@ -141,7 +140,7 @@ Nodemailer SMTP Transporter
 
 ## Free vs. Paid
 
-| Feature | Free (MIT) | [Paid ($7)](https://gumroad.com/l/multi-tenant-nodemailer-pool) |
+| Feature | Free (MIT) | [Paid ($7)](https://payhip.com/b/h8vRj) |
 | :--- | :---: | :---: |
 | SHA-256 config fingerprinting | ✓ | ✓ |
 | Transporter pooling and reuse | ✓ | ✓ |
@@ -157,7 +156,7 @@ Nodemailer SMTP Transporter
 
 The paid version adds production-oriented functionality for applications requiring encrypted credential storage at rest, platform fallback configurations, connection diagnostics, PostgreSQL migrations, and a comprehensive test suite.
 
-👉 **[Get the Full Version for $7 on Gumroad](https://gumroad.com/l/multi-tenant-nodemailer-pool)**
+👉 **[Get the Full Version for $7 on Payhip](https://payhip.com/b/h8vRj)**
 
 ---
 
